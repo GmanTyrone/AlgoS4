@@ -9,13 +9,16 @@ int main()
 
 	while (cin >> n)
 	{
-		vector<int> str(n);
-		for (int i = 0; i < n; ++i) cin >> str[i];
+		//Sequence and gets sequence
+		vector<int> sequence(n);
+		for (int i = 0; i < n; ++i) cin >> sequence[i];
 
-		vector<int> lis;
-		vector<int> lds;
-		lis.emplace_back(str[0]);
-		lds.emplace_back(str[n - 1]);
+
+		//Increasing and decreasing sequences
+		vector<int> increasing;
+		vector<int> decreasing;
+		increasing.emplace_back(sequence[0]);
+		decreasing.emplace_back(sequence[n - 1]);
 
 		vector<int> num1(n);
 		vector<int> num2(n);
@@ -26,38 +29,45 @@ int main()
 
 		for (int i = 1; i < n; ++i)
 		{
-			//lis
-			if (str[i] > lis.back())
+			//increasing
+			if (sequence[i] > increasing.back())
 			{
-				lis.emplace_back(str[i]);
+				increasing.emplace_back(sequence[i]);
+				//adds one element
 				num1[i] = ++cnt1;
 			}
 			else
 			{
-				auto it = lower_bound(lis.begin(), lis.end(), str[i]);
-				*it = str[i];
-				num1[i] = (it - lis.begin() + 1);
+				//position of next value greater than current one
+				auto iterator = lower_bound(increasing.begin(), increasing.end(), sequence[i]);
+				//moves the iterator
+				*iterator = sequence[i];
+
+				num1[i] = (iterator - increasing.begin() + 1);
 			}
 
-			//lds
+			//decreasing
 			int j = n - i - 1;
-			if (str[j] > lds.back())
+			if (sequence[j] > decreasing.back())
 			{
-				lds.emplace_back(str[j]);
+				decreasing.emplace_back(sequence[j]);
 				num2[j] = ++cnt2;
 			}
 			else
 			{
-				auto it = lower_bound(lds.begin(), lds.end(), str[j]);
-				*it = str[j];
-				num2[j] = (it - lds.begin() + 1);
+				auto iterator = lower_bound(decreasing.begin(), decreasing.end(), sequence[j]);
+				*iterator = sequence[j];
+				num2[j] = (iterator - decreasing.begin() + 1);
 			}
 		}
 
+		//Returns minimum count
 		int t = min(cnt1, cnt2);
 
-		for (; t > 0; --t) for (int i = 0; i < n; ++i)
-			if (num1[i] >= t && num2[i] >= t) goto out;
+		//Looks for the actual biggest sequence
+		for (; t > 0; --t)
+            for (int i = 0; i < n; ++i)
+                if (num1[i] >= t && num2[i] >= t) goto out;
 
 	out:
 		cout << t * 2 - 1 << "\n";
